@@ -1,17 +1,17 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useCallback } from 'react'
 
 export interface Toast {
   id: string
   message: string
-  type: 'success' | 'error' | 'info'
+  type: 'success' | 'error' | 'warning' | 'info'
 }
 
-interface ToastItemProps {
+interface ToastProps {
   toast: Toast
   onRemove: (id: string) => void
 }
 
-function ToastItem({ toast, onRemove }: ToastItemProps) {
+function ToastItem({ toast, onRemove }: ToastProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       onRemove(toast.id)
@@ -19,21 +19,106 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
     return () => clearTimeout(timer)
   }, [toast.id, onRemove])
 
-  const bgColor = {
-    success: 'bg-green-500',
-    error: 'bg-red-500',
-    info: 'bg-blue-500',
-  }[toast.type]
+  const getIcon = () => {
+    switch (toast.type) {
+      case 'success':
+        return '✅'
+      case 'error':
+        return '❌'
+      case 'warning':
+        return '⚠️'
+      case 'info':
+        return 'ℹ️'
+      default:
+        return 'ℹ️'
+    }
+  }
+
+  const getColors = () => {
+    switch (toast.type) {
+      case 'success':
+        return {
+          background: 'var(--success-50)',
+          border: 'var(--success-100)',
+          icon: 'var(--success-500)',
+        }
+      case 'error':
+        return {
+          background: 'var(--error-50)',
+          border: 'var(--error-100)',
+          icon: 'var(--error-500)',
+        }
+      case 'warning':
+        return {
+          background: 'var(--warning-50)',
+          border: 'var(--warning-100)',
+          icon: 'var(--warning-500)',
+        }
+      case 'info':
+        return {
+          background: 'var(--info-50)',
+          border: 'var(--info-100)',
+          icon: 'var(--info-500)',
+        }
+      default:
+        return {
+          background: 'var(--gray-50)',
+          border: 'var(--gray-200)',
+          icon: 'var(--gray-500)',
+        }
+    }
+  }
+
+  const colors = getColors()
 
   return (
     <div
-      className={`flex items-center justify-between rounded-lg ${bgColor} px-4 py-3 text-white shadow-lg`}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        padding: '14px 18px',
+        background: colors.background,
+        border: `1px solid ${colors.border}`,
+        borderRadius: 'var(--radius-xl)',
+        boxShadow: 'var(--shadow-lg)',
+        animation: 'slideInRight 0.3s ease-out',
+        minWidth: '280px',
+        maxWidth: '400px',
+      }}
     >
-      <span className="text-sm">{toast.message}</span>
+      <span style={{ fontSize: '20px' }}>{getIcon()}</span>
+      <span
+        style={{
+          flex: 1,
+          fontSize: '14px',
+          fontWeight: 500,
+          color: 'var(--gray-800)',
+        }}
+      >
+        {toast.message}
+      </span>
       <button
-        type="button"
         onClick={() => onRemove(toast.id)}
-        className="ml-3 text-white/80 hover:text-white"
+        style={{
+          background: 'transparent',
+          border: 'none',
+          fontSize: '18px',
+          color: 'var(--gray-400)',
+          cursor: 'pointer',
+          padding: '4px',
+          borderRadius: 'var(--radius-md)',
+          transition: 'all var(--transition-fast)',
+          lineHeight: 1,
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.color = 'var(--gray-600)'
+          e.currentTarget.style.background = 'rgba(0,0,0,0.05)'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.color = 'var(--gray-400)'
+          e.currentTarget.style.background = 'transparent'
+        }}
       >
         ✕
       </button>
@@ -47,12 +132,23 @@ interface ToastContainerProps {
 }
 
 export function ToastContainer({ toasts, onRemove }: ToastContainerProps) {
-  if (toasts.length === 0) return null
-
   return (
-    <div className="fixed right-4 top-4 z-50 flex flex-col gap-2">
+    <div
+      style={{
+        position: 'fixed',
+        top: '20px',
+        right: '20px',
+        zIndex: 9999,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+        pointerEvents: 'none',
+      }}
+    >
       {toasts.map((toast) => (
-        <ToastItem key={toast.id} toast={toast} onRemove={onRemove} />
+        <div key={toast.id} style={{ pointerEvents: 'auto' }}>
+          <ToastItem toast={toast} onRemove={onRemove} />
+        </div>
       ))}
     </div>
   )
@@ -62,24 +158,43 @@ export function useToast() {
   const [toasts, setToasts] = useState<Toast[]>([])
 
   const addToast = useCallback((message: string, type: Toast['type'] = 'info') => {
-    const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+    const id = Math.random().toString(36).substring(2, 9)
     setToasts((prev) => [...prev, { id, message, type }])
   }, [])
 
   const removeToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id))
+    setToasts((prev) => prev.filter((toast) => toast.id !== id))
   }, [])
 
-  const success = useCallback((message: string) => addToast(message, 'success'), [addToast])
-  const error = useCallback((message: string) => addToast(message, 'error'), [addToast])
-  const info = useCallback((message: string) => addToast(message, 'info'), [addToast])
+  const success = useCallback(
+    (message: string) => addToast(message, 'success'),
+    [addToast],
+  )
+
+  const error = useCallback(
+    (message: string) => addToast(message, 'error'),
+    [addToast],
+  )
+
+  const warning = useCallback(
+    (message: string) => addToast(message, 'warning'),
+    [addToast],
+  )
+
+  const info = useCallback(
+    (message: string) => addToast(message, 'info'),
+    [addToast],
+  )
 
   return {
     toasts,
-    addToast,
     removeToast,
     success,
     error,
+    warning,
     info,
   }
 }
+
+// Add missing import
+import { useState } from 'react'

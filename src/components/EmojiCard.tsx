@@ -52,58 +52,152 @@ export function EmojiCard({
 
   return (
     <div
-      className={`group relative overflow-hidden rounded-lg border-2 bg-white transition-all ${
-        emoji.isSelected
-          ? 'border-blue-500 shadow-md'
-          : 'border-gray-200 hover:border-gray-300'
-      }`}
+      style={{
+        position: 'relative',
+        background: 'white',
+        borderRadius: 'var(--radius-xl)',
+        overflow: 'hidden',
+        border: `2px solid ${emoji.isSelected ? 'var(--primary-500)' : 'var(--gray-200)'}`,
+        boxShadow: emoji.isSelected ? 'var(--shadow-primary)' : 'var(--shadow-sm)',
+        transition: 'all var(--transition-fast)',
+        transform: emoji.isSelected ? 'translateY(-2px)' : 'translateY(0)',
+      }}
+      onMouseEnter={(e) => {
+        if (!emoji.isSelected) {
+          e.currentTarget.style.borderColor = 'var(--primary-300)'
+          e.currentTarget.style.boxShadow = 'var(--shadow-md)'
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!emoji.isSelected) {
+          e.currentTarget.style.borderColor = 'var(--gray-200)'
+          e.currentTarget.style.boxShadow = 'var(--shadow-sm)'
+        }
+      }}
     >
+      {/* Checkbox */}
       <div
-        className="relative cursor-pointer"
         onClick={() => onToggleSelect(emoji.id)}
+        style={{
+          position: 'absolute',
+          top: '10px',
+          left: '10px',
+          zIndex: 10,
+          width: '24px',
+          height: '24px',
+          borderRadius: 'var(--radius-md)',
+          background: emoji.isSelected
+            ? 'linear-gradient(135deg, var(--primary-500), var(--primary-600))'
+            : 'white',
+          border: `2px solid ${emoji.isSelected ? 'var(--primary-500)' : 'var(--gray-300)'}`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          boxShadow: emoji.isSelected ? 'var(--shadow-primary)' : 'var(--shadow-sm)',
+          transition: 'all var(--transition-fast)',
+        }}
+      >
+        {emoji.isSelected && (
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 20 20"
+            fill="white"
+          >
+            <path
+              fillRule="evenodd"
+              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+              clipRule="evenodd"
+            />
+          </svg>
+        )}
+      </div>
+
+      {/* Image Container */}
+      <div
+        onClick={() => onToggleSelect(emoji.id)}
+        style={{
+          position: 'relative',
+          aspectRatio: '1',
+          background: 'var(--gray-50)',
+          cursor: 'pointer',
+          overflow: 'hidden',
+        }}
       >
         <img
           src={emoji.objectUrl}
           alt={emoji.fileName}
-          className="aspect-square w-full object-cover"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          }}
         />
-        <div className="absolute left-2 top-2">
-          <div
-            className={`flex h-5 w-5 items-center justify-center rounded border-2 ${
-              emoji.isSelected
-                ? 'border-blue-500 bg-blue-500'
-                : 'border-gray-300 bg-white'
-            }`}
-          >
-            {emoji.isSelected && (
-              <svg
-                className="h-3 w-3 text-white"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  clipRule="evenodd"
-                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                  fillRule="evenodd"
-                />
-              </svg>
-            )}
-          </div>
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+        
+        {/* Hover Overlay with Download Button */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: 0,
+            transition: 'opacity var(--transition-fast)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.opacity = '1'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.opacity = '0'
+          }}
+        >
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation()
               onDownload(emoji)
             }}
-            className="rounded bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+            style={{
+              padding: '10px 18px',
+              background: 'white',
+              border: 'none',
+              borderRadius: 'var(--radius-lg)',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: 'var(--gray-700)',
+              cursor: 'pointer',
+              boxShadow: 'var(--shadow-md)',
+              transition: 'all var(--transition-fast)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)'
+              e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)'
+              e.currentTarget.style.boxShadow = 'var(--shadow-md)'
+            }}
           >
-            下载
+            <span>⬇️</span>
+            <span>下载</span>
           </button>
         </div>
       </div>
-      <div className="border-t border-gray-100 p-2">
+
+      {/* File Name */}
+      <div
+        style={{
+          padding: '12px',
+          borderTop: '1px solid var(--gray-100)',
+          background: 'white',
+        }}
+      >
         {isEditing ? (
           <input
             ref={inputRef}
@@ -112,13 +206,42 @@ export function EmojiCard({
             onChange={(e) => setEditValue(e.target.value)}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
-            className="w-full rounded border border-blue-300 px-2 py-1 text-center text-sm focus:border-blue-500 focus:outline-none"
+            style={{
+              width: '100%',
+              padding: '8px 10px',
+              border: '2px solid var(--primary-500)',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '13px',
+              textAlign: 'center',
+              outline: 'none',
+              boxShadow: '0 0 0 3px var(--primary-100)',
+            }}
           />
         ) : (
           <div
             onDoubleClick={handleDoubleClick}
-            className="cursor-pointer truncate text-center text-sm text-gray-700 hover:text-blue-600"
+            style={{
+              fontSize: '13px',
+              fontWeight: 500,
+              color: 'var(--gray-700)',
+              textAlign: 'center',
+              cursor: 'pointer',
+              padding: '8px 4px',
+              borderRadius: 'var(--radius-md)',
+              transition: 'all var(--transition-fast)',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
             title="双击编辑文件名"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--primary-50)'
+              e.currentTarget.style.color = 'var(--primary-700)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent'
+              e.currentTarget.style.color = 'var(--gray-700)'
+            }}
           >
             {emoji.fileName}
           </div>

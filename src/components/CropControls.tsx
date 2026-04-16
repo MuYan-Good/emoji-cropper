@@ -176,77 +176,168 @@ export function CropControls({
 
   const hasError = rowsError || colsError || widthError || heightError
 
-  return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4" onKeyDown={handleKeyDown}>
-      <h3 className="mb-4 text-sm font-medium text-gray-700">裁剪设置</h3>
+  const inputStyle = (error: string | null): React.CSSProperties => ({
+    width: '100%',
+    padding: '12px 16px',
+    border: `2px solid ${error ? 'var(--error-500)' : 'var(--gray-200)'}`,
+    borderRadius: 'var(--radius-lg)',
+    fontSize: '15px',
+    fontWeight: 600,
+    textAlign: 'center',
+    background: error ? 'var(--error-50)' : 'white',
+    color: 'var(--gray-800)',
+    transition: 'all var(--transition-fast)',
+    outline: 'none',
+  })
 
-      <div className="mb-4 grid grid-cols-2 gap-4">
-        <div>
-          <label className="mb-1 block text-xs text-gray-500">行数</label>
-          <input
-            type="number"
-            min={1}
-            max={MAX_GRID}
-            value={localRows}
-            onChange={(e) => setLocalRows(e.target.value)}
-            onBlur={handleRowsBlur}
-            disabled={disabled}
-            className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none disabled:bg-gray-100 ${
-              rowsError ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'
-            }`}
-          />
-          {rowsError && <p className="mt-1 text-xs text-red-500">{rowsError}</p>}
+  const labelStyle: React.CSSProperties = {
+    fontSize: '12px',
+    fontWeight: 600,
+    color: 'var(--gray-500)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+    marginBottom: '8px',
+    display: 'block',
+  }
+
+  return (
+    <div
+      onKeyDown={handleKeyDown}
+      style={{
+        background: 'white',
+        borderRadius: 'var(--radius-xl)',
+        padding: '24px',
+        boxShadow: 'var(--shadow-md)',
+        border: '1px solid var(--gray-100)',
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          marginBottom: '24px',
+          paddingBottom: '16px',
+          borderBottom: '2px solid var(--gray-100)',
+        }}
+      >
+        <div
+          style={{
+            width: '36px',
+            height: '36px',
+            background: 'linear-gradient(135deg, var(--primary-500), var(--primary-600))',
+            borderRadius: 'var(--radius-lg)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '18px',
+            boxShadow: 'var(--shadow-primary)',
+          }}
+        >
+          ⚙️
         </div>
-        <div>
-          <label className="mb-1 block text-xs text-gray-500">列数</label>
-          <input
-            type="number"
-            min={1}
-            max={MAX_GRID}
-            value={localCols}
-            onChange={(e) => setLocalCols(e.target.value)}
-            onBlur={handleColsBlur}
-            disabled={disabled}
-            className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none disabled:bg-gray-100 ${
-              colsError ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'
-            }`}
-          />
-          {colsError && <p className="mt-1 text-xs text-red-500">{colsError}</p>}
+        <span style={{ fontSize: '17px', fontWeight: 700, color: 'var(--gray-800)' }}>
+          裁剪设置
+        </span>
+      </div>
+
+      {/* Grid Config */}
+      <div style={{ marginBottom: '24px' }}>
+        <label style={labelStyle}>网格配置</label>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div>
+            <input
+              type="number"
+              min={1}
+              max={MAX_GRID}
+              value={localRows}
+              onChange={(e) => setLocalRows(e.target.value)}
+              onBlur={handleRowsBlur}
+              disabled={disabled}
+              style={inputStyle(rowsError)}
+              onFocus={(e) => {
+                e.target.style.borderColor = 'var(--primary-400)'
+                e.target.style.boxShadow = '0 0 0 4px var(--primary-100)'
+              }}
+              onBlurCapture={(e) => {
+                e.target.style.borderColor = rowsError ? 'var(--error-500)' : 'var(--gray-200)'
+                e.target.style.boxShadow = 'none'
+              }}
+            />
+            <div style={{ fontSize: '12px', color: 'var(--gray-400)', marginTop: '6px', textAlign: 'center' }}>
+              行数
+            </div>
+            {rowsError && (
+              <p style={{ marginTop: '6px', fontSize: '12px', color: 'var(--error-500)' }}>{rowsError}</p>
+            )}
+          </div>
+          <div>
+            <input
+              type="number"
+              min={1}
+              max={MAX_GRID}
+              value={localCols}
+              onChange={(e) => setLocalCols(e.target.value)}
+              onBlur={handleColsBlur}
+              disabled={disabled}
+              style={inputStyle(colsError)}
+              onFocus={(e) => {
+                e.target.style.borderColor = 'var(--primary-400)'
+                e.target.style.boxShadow = '0 0 0 4px var(--primary-100)'
+              }}
+              onBlurCapture={(e) => {
+                e.target.style.borderColor = colsError ? 'var(--error-500)' : 'var(--gray-200)'
+                e.target.style.boxShadow = 'none'
+              }}
+            />
+            <div style={{ fontSize: '12px', color: 'var(--gray-400)', marginTop: '6px', textAlign: 'center' }}>
+              列数
+            </div>
+            {colsError && (
+              <p style={{ marginTop: '6px', fontSize: '12px', color: 'var(--error-500)' }}>{colsError}</p>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="mb-4">
-        <div className="mb-2 flex items-center justify-between">
-          <label className="text-xs text-gray-500">输出尺寸</label>
+      {/* Output Size */}
+      <div style={{ marginBottom: '24px' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '12px',
+          }}
+        >
+          <label style={labelStyle}>输出尺寸</label>
           <button
             type="button"
             onClick={() => onAspectRatioLockChange(!aspectRatioLocked)}
             disabled={disabled}
-            className={`flex items-center gap-1 rounded px-2 py-1 text-xs transition-colors ${
-              aspectRatioLocked
-                ? 'bg-blue-100 text-blue-600'
-                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-            } disabled:opacity-50`}
-            title={aspectRatioLocked ? '点击解锁宽高比' : '点击锁定宽高比'}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-md)',
+              border: 'none',
+              fontSize: '12px',
+              fontWeight: 600,
+              cursor: disabled ? 'not-allowed' : 'pointer',
+              opacity: disabled ? 0.5 : 1,
+              background: aspectRatioLocked ? 'var(--primary-100)' : 'var(--gray-100)',
+              color: aspectRatioLocked ? 'var(--primary-700)' : 'var(--gray-600)',
+              transition: 'all var(--transition-fast)',
+            }}
           >
-            {aspectRatioLocked ? (
-              <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 2a4 4 0 00-4 4v2H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-1V6a4 4 0 00-4-4zm2 6V6a2 2 0 10-4 0v2h4z" />
-              </svg>
-            ) : (
-              <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 2a4 4 0 00-4 4v2H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-1V6a4 4 0 00-4-4zm2 6V6a2 2 0 10-4 0v2h4z" />
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0l10 10a1 1 0 01-1.414 1.414l-10-10a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            )}
-            {aspectRatioLocked ? '已锁定' : '未锁定'}
+            <span>{aspectRatioLocked ? '🔒' : '🔓'}</span>
+            <span>{aspectRatioLocked ? '已锁定' : '未锁定'}</span>
           </button>
         </div>
-        <div className="grid grid-cols-2 gap-2">
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
           <div>
             <input
               type="number"
@@ -256,11 +347,22 @@ export function CropControls({
               onBlur={handleWidthBlur}
               disabled={disabled}
               placeholder="宽度"
-              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none disabled:bg-gray-100 ${
-                widthError ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'
-              }`}
+              style={inputStyle(widthError)}
+              onFocus={(e) => {
+                e.target.style.borderColor = 'var(--primary-400)'
+                e.target.style.boxShadow = '0 0 0 4px var(--primary-100)'
+              }}
+              onBlurCapture={(e) => {
+                e.target.style.borderColor = widthError ? 'var(--error-500)' : 'var(--gray-200)'
+                e.target.style.boxShadow = 'none'
+              }}
             />
-            {widthError && <p className="mt-1 text-xs text-red-500">{widthError}</p>}
+            <div style={{ fontSize: '12px', color: 'var(--gray-400)', marginTop: '6px', textAlign: 'center' }}>
+              宽度 (px)
+            </div>
+            {widthError && (
+              <p style={{ marginTop: '6px', fontSize: '12px', color: 'var(--error-500)' }}>{widthError}</p>
+            )}
           </div>
           <div>
             <input
@@ -271,25 +373,55 @@ export function CropControls({
               onBlur={handleHeightBlur}
               disabled={disabled}
               placeholder="高度"
-              className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none disabled:bg-gray-100 ${
-                heightError ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'
-              }`}
+              style={inputStyle(heightError)}
+              onFocus={(e) => {
+                e.target.style.borderColor = 'var(--primary-400)'
+                e.target.style.boxShadow = '0 0 0 4px var(--primary-100)'
+              }}
+              onBlurCapture={(e) => {
+                e.target.style.borderColor = heightError ? 'var(--error-500)' : 'var(--gray-200)'
+                e.target.style.boxShadow = 'none'
+              }}
             />
-            {heightError && <p className="mt-1 text-xs text-red-500">{heightError}</p>}
+            <div style={{ fontSize: '12px', color: 'var(--gray-400)', marginTop: '6px', textAlign: 'center' }}>
+              高度 (px)
+            </div>
+            {heightError && (
+              <p style={{ marginTop: '6px', fontSize: '12px', color: 'var(--error-500)' }}>{heightError}</p>
+            )}
           </div>
         </div>
-        <div className="mt-2 flex flex-wrap gap-2">
+
+        {/* Preset Sizes */}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           {PRESET_SIZES.map((size) => (
             <button
               key={`${size.width}x${size.height}`}
               type="button"
               onClick={() => onOutputSizeChange(size)}
               disabled={disabled}
-              className={`rounded px-2 py-1 text-xs transition-colors ${
-                outputSize.width === size.width && outputSize.height === size.height
-                  ? 'bg-blue-500 text-white'
-                  : 'border border-gray-300 bg-white text-gray-600 hover:bg-gray-50'
-              } disabled:cursor-not-allowed disabled:opacity-50`}
+              style={{
+                padding: '8px 14px',
+                borderRadius: 'var(--radius-md)',
+                border: 'none',
+                fontSize: '12px',
+                fontWeight: 600,
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                opacity: disabled ? 0.5 : 1,
+                background:
+                  outputSize.width === size.width && outputSize.height === size.height
+                    ? 'linear-gradient(135deg, var(--primary-500), var(--primary-600))'
+                    : 'var(--gray-100)',
+                color:
+                  outputSize.width === size.width && outputSize.height === size.height
+                    ? 'white'
+                    : 'var(--gray-600)',
+                boxShadow:
+                  outputSize.width === size.width && outputSize.height === size.height
+                    ? 'var(--shadow-primary)'
+                    : 'none',
+                transition: 'all var(--transition-fast)',
+              }}
             >
               {size.width}×{size.height}
             </button>
@@ -297,29 +429,120 @@ export function CropControls({
         </div>
       </div>
 
+      {/* Warning */}
       {sizeWarning && (
-        <div className="mb-4 rounded-lg bg-yellow-50 p-3 text-xs text-yellow-700">
-          ⚠️ {sizeWarning}
+        <div
+          style={{
+            background: 'var(--warning-50)',
+            border: '1px solid var(--warning-200)',
+            borderRadius: 'var(--radius-lg)',
+            padding: '14px 16px',
+            marginBottom: '20px',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '10px',
+          }}
+        >
+          <span style={{ fontSize: '16px' }}>⚠️</span>
+          <span style={{ fontSize: '13px', color: 'var(--warning-700)', lineHeight: 1.5 }}>{sizeWarning}</span>
         </div>
       )}
 
-      <div className="mb-4 flex items-center justify-between text-sm text-gray-500">
-        <span>将生成 {totalEmojis} 个表情</span>
-        <span className="text-xs text-gray-400">
-          输出: {outputSize.width}×{outputSize.height}
+      {/* Summary */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '14px 16px',
+          background: 'var(--gray-50)',
+          borderRadius: 'var(--radius-lg)',
+          marginBottom: '20px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '20px' }}>🎯</span>
+          <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--gray-700)' }}>
+            将生成 {totalEmojis} 个表情
+          </span>
+        </div>
+        <span style={{ fontSize: '12px', color: 'var(--gray-400)' }}>
+          输出: {outputSize.width}×{outputSize.height}px
         </span>
       </div>
 
+      {/* Crop Button */}
       <button
         type="button"
         onClick={onCrop}
         disabled={disabled || isCropping || !!hasError}
-        className="w-full rounded-lg bg-blue-500 px-4 py-3 font-medium text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+        style={{
+          width: '100%',
+          padding: '16px 24px',
+          borderRadius: 'var(--radius-xl)',
+          border: 'none',
+          fontSize: '16px',
+          fontWeight: 700,
+          cursor: disabled || isCropping || !!hasError ? 'not-allowed' : 'pointer',
+          background:
+            disabled || isCropping || !!hasError
+              ? 'var(--gray-200)'
+              : 'linear-gradient(135deg, var(--primary-500), var(--primary-600))',
+          color: disabled || isCropping || !!hasError ? 'var(--gray-400)' : 'white',
+          boxShadow: disabled || isCropping || !!hasError ? 'none' : 'var(--shadow-primary)',
+          transition: 'all var(--transition-fast)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '10px',
+        }}
+        onMouseEnter={(e) => {
+          if (!(disabled || isCropping || !!hasError)) {
+            e.currentTarget.style.transform = 'translateY(-2px)'
+            e.currentTarget.style.boxShadow = 'var(--shadow-lg)'
+          }
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)'
+          if (!(disabled || isCropping || !!hasError)) {
+            e.currentTarget.style.boxShadow = 'var(--shadow-primary)'
+          }
+        }}
       >
-        {isCropping ? '裁剪中...' : '一键裁剪'}
+        {isCropping ? (
+          <>
+            <span
+              style={{
+                width: '20px',
+                height: '20px',
+                border: '3px solid var(--gray-300)',
+                borderTopColor: 'var(--gray-500)',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+              }}
+            />
+            <span>裁剪中...</span>
+          </>
+        ) : (
+          <>
+            <span style={{ fontSize: '20px' }}>✂️</span>
+            <span>一键裁剪</span>
+          </>
+        )}
       </button>
 
-      {!disabled && <p className="mt-2 text-center text-xs text-gray-400">按 Enter 键快速裁剪</p>}
+      {!disabled && (
+        <p
+          style={{
+            marginTop: '12px',
+            textAlign: 'center',
+            fontSize: '12px',
+            color: 'var(--gray-400)',
+          }}
+        >
+          按 Enter 键快速裁剪
+        </p>
+      )}
     </div>
   )
 }

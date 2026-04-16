@@ -71,46 +71,173 @@ export function ImageUploader({ onImageLoad, currentImage, isLoading }: ImageUpl
 
   if (currentImage) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-4">
-        <div className="mb-2 flex items-center justify-between">
-          <span className="text-sm text-gray-600">已上传图片</span>
+      <div 
+        className="image-uploader-preview"
+        style={{
+          background: 'white',
+          borderRadius: 'var(--radius-xl)',
+          padding: '20px',
+          boxShadow: 'var(--shadow-md)',
+          border: '1px solid var(--gray-100)',
+        }}
+      >
+        <div 
+          className="preview-header"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '16px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div
+              style={{
+                width: '8px',
+                height: '8px',
+                background: 'var(--success-500)',
+                borderRadius: '50%',
+                animation: 'pulse 2s ease-in-out infinite',
+              }}
+            />
+            <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--gray-700)' }}>
+              已上传图片
+            </span>
+          </div>
           <button
             type="button"
             onClick={() => onImageLoad(null, null)}
-            className="text-sm text-red-500 hover:text-red-600"
+            style={{
+              fontSize: '13px',
+              color: 'var(--error-500)',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-md)',
+              transition: 'all var(--transition-fast)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--error-50)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent'
+            }}
           >
             重新上传
           </button>
         </div>
-        <img
-          src={currentImage.src}
-          alt="Uploaded sprite"
-          className="max-h-64 rounded-lg border border-gray-100"
-        />
+        <div
+          style={{
+            position: 'relative',
+            borderRadius: 'var(--radius-lg)',
+            overflow: 'hidden',
+            border: '1px solid var(--gray-100)',
+          }}
+        >
+          <img
+            src={currentImage.src}
+            alt="Uploaded sprite"
+            style={{
+              width: '100%',
+              maxHeight: '300px',
+              objectFit: 'contain',
+              display: 'block',
+            }}
+          />
+        </div>
       </div>
     )
   }
 
   return (
-    <div>
+    <div
+      {...getRootProps()}
+      style={{
+        background: isDragActive 
+          ? 'linear-gradient(135deg, var(--primary-50), var(--primary-100))'
+          : 'white',
+        border: `2px dashed ${isDragActive ? 'var(--primary-500)' : isDragReject ? 'var(--error-500)' : 'var(--gray-300)'}`,
+        borderRadius: 'var(--radius-2xl)',
+        padding: '48px 32px',
+        textAlign: 'center',
+        cursor: isLoading ? 'not-allowed' : 'pointer',
+        opacity: isLoading ? 0.6 : 1,
+        transition: 'all var(--transition-normal)',
+        boxShadow: isDragActive ? 'var(--shadow-glow)' : 'var(--shadow-sm)',
+      }}
+    >
+      <input {...getInputProps()} />
+      
       <div
-        {...getRootProps()}
-        className={`cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
-          isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
-        } ${isDragReject ? 'border-red-500 bg-red-50' : ''} ${isLoading ? 'pointer-events-none opacity-50' : ''}`}
+        style={{
+          width: '80px',
+          height: '80px',
+          margin: '0 auto 20px',
+          background: isDragActive 
+            ? 'linear-gradient(135deg, var(--primary-400), var(--primary-500))'
+            : 'linear-gradient(135deg, var(--primary-100), var(--primary-200))',
+          borderRadius: 'var(--radius-xl)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '36px',
+          transition: 'all var(--transition-normal)',
+          transform: isDragActive ? 'scale(1.1)' : 'scale(1)',
+        }}
       >
-        <input {...getInputProps()} />
-        <div className="text-gray-500">
-          {isDragActive ? (
-            <p>放开以上传图片</p>
-          ) : (
-            <div>
-              <p className="mb-2 text-lg">拖拽图片到这里，或点击上传</p>
-              <p className="text-sm">支持 PNG、GIF 格式，最大 10MB</p>
-            </div>
-          )}
-        </div>
+        {isDragActive ? '📥' : '📁'}
       </div>
+      
+      <div
+        style={{
+          fontSize: '16px',
+          fontWeight: 600,
+          color: isDragActive ? 'var(--primary-700)' : 'var(--gray-700)',
+          marginBottom: '8px',
+          transition: 'color var(--transition-fast)',
+        }}
+      >
+        {isDragActive ? '放开以上传图片' : '拖拽图片到这里，或点击选择文件'}
+      </div>
+      
+      <div style={{ fontSize: '13px', color: 'var(--gray-400)' }}>
+        支持 PNG、GIF 格式，最大 10MB
+      </div>
+      
+      {!isDragActive && (
+        <div
+          style={{
+            display: 'flex',
+            gap: '8px',
+            justifyContent: 'center',
+            marginTop: '16px',
+          }}
+        >
+          <span
+            style={{
+              fontSize: '11px',
+              padding: '4px 10px',
+              background: 'var(--gray-100)',
+              color: 'var(--gray-500)',
+              borderRadius: 'var(--radius-full)',
+            }}
+          >
+            PNG
+          </span>
+          <span
+            style={{
+              fontSize: '11px',
+              padding: '4px 10px',
+              background: 'var(--gray-100)',
+              color: 'var(--gray-500)',
+              borderRadius: 'var(--radius-full)',
+            }}
+          >
+            GIF
+          </span>
+        </div>
+      )}
     </div>
   )
 }

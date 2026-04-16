@@ -10,6 +10,7 @@ import { useExport } from './hooks/useExport'
 import type { GridConfig, EmojiItem, OutputSize } from './types/image'
 import type { ImageInfo } from './hooks/useImageUpload'
 import { DEFAULT_OUTPUT_SIZE } from './utils/constants'
+import './App.css'
 
 function App() {
   const [image, setImage] = useState<HTMLImageElement | null>(null)
@@ -83,31 +84,129 @@ function App() {
   }, [getSelectedEmojis, downloadSelected, showError, success])
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div style={{ minHeight: '100vh' }}>
       <ToastContainer toasts={toasts} onRemove={removeToast} />
 
-      <div className="mx-auto max-w-5xl">
-        <header className="mb-6 text-center">
-          <h1 className="text-2xl font-bold text-gray-900">表情包雪碧图裁剪工具</h1>
-          <p className="mt-2 text-sm text-gray-500">上传雪碧图，一键裁剪为单个表情</p>
-        </header>
-
-        <div className="grid gap-6 lg:grid-cols-2">
-          <div className="space-y-4">
-            <ImageUploader
-              onImageLoad={handleImageLoad}
-              currentImage={image}
-              isLoading={false}
-            />
-
-            {image && <GridPreview image={image} config={config} />}
+      {/* Header */}
+      <header
+        style={{
+          background: 'white',
+          borderBottom: '1px solid var(--gray-200)',
+          padding: '16px 24px',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100,
+          boxShadow: 'var(--shadow-sm)',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '1280px',
+            margin: '0 auto',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '44px',
+                height: '44px',
+                background: 'linear-gradient(135deg, var(--primary-500), var(--primary-600))',
+                borderRadius: 'var(--radius-xl)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '24px',
+                boxShadow: 'var(--shadow-primary)',
+              }}
+            >
+              ✂️
+            </div>
+            <div>
+              <h1
+                style={{
+                  fontSize: '20px',
+                  fontWeight: 700,
+                  background: 'linear-gradient(135deg, var(--primary-600), var(--primary-500))',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                表情包裁剪工具
+              </h1>
+              <p style={{ fontSize: '12px', color: 'var(--gray-500)', marginTop: '2px' }}>
+                上传雪碧图，一键裁剪为单个表情
+              </p>
+            </div>
           </div>
+          <a
+            href="https://github.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 16px',
+              background: 'var(--gray-100)',
+              borderRadius: 'var(--radius-lg)',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: 'var(--gray-600)',
+              textDecoration: 'none',
+              transition: 'all var(--transition-fast)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--gray-200)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'var(--gray-100)'
+            }}
+          >
+            <span>⭐</span>
+            <span>GitHub</span>
+          </a>
+        </div>
+      </header>
 
-          <div>
+      {/* Main Content */}
+      <main
+        style={{
+          maxWidth: '1280px',
+          margin: '0 auto',
+          padding: '32px 24px',
+        }}
+      >
+        {/* Upload Section */}
+        <section style={{ marginBottom: '32px' }}>
+          <ImageUploader
+            onImageLoad={handleImageLoad}
+            currentImage={image}
+            isLoading={false}
+          />
+        </section>
+
+        {/* Grid and Controls Section */}
+        {image && (
+          <section
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gap: '24px',
+              marginBottom: '32px',
+              animation: 'fadeInUp 0.5s ease-out',
+            }}
+          >
+            <GridPreview image={image} config={config} />
             <CropControls
               config={config}
               outputSize={outputSize}
-              imageSize={imageInfo ? { width: imageInfo.width, height: imageInfo.height } : undefined}
+              imageSize={
+                imageInfo ? { width: imageInfo.width, height: imageInfo.height } : undefined
+              }
               aspectRatioLocked={aspectRatioLocked}
               onConfigChange={setConfig}
               onOutputSizeChange={setOutputSize}
@@ -116,71 +215,150 @@ function App() {
               disabled={!image}
               isCropping={isCropping}
             />
+          </section>
+        )}
 
-            {imageInfo && (
-              <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-600">
-                <p>
-                  图片尺寸: {imageInfo.width} × {imageInfo.height}
-                </p>
-                <p>
-                  文件名: {imageInfo.fileName}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-
+        {/* Loading State */}
         {isCropping && (
-          <div className="mt-4 rounded-lg bg-blue-50 p-4 text-sm text-blue-600">
-            <div className="flex items-center gap-2">
-              <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  fill="none"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
+          <div
+            style={{
+              background: 'var(--primary-50)',
+              border: '1px solid var(--primary-200)',
+              borderRadius: 'var(--radius-xl)',
+              padding: '24px',
+              marginBottom: '32px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '12px',
+              animation: 'fadeIn 0.3s ease-out',
+            }}
+          >
+            <div
+              style={{
+                width: '24px',
+                height: '24px',
+                border: '3px solid var(--primary-200)',
+                borderTopColor: 'var(--primary-500)',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+              }}
+            />
+            <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--primary-700)' }}>
               正在裁剪中，请稍候...
-            </div>
+            </span>
           </div>
         )}
 
+        {/* Export Loading State */}
         {isExporting && (
-          <div className="mt-4 rounded-lg bg-blue-50 p-4 text-sm text-blue-600">
-            正在处理下载...
+          <div
+            style={{
+              background: 'var(--info-50)',
+              border: '1px solid var(--info-200)',
+              borderRadius: 'var(--radius-xl)',
+              padding: '24px',
+              marginBottom: '32px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '12px',
+              animation: 'fadeIn 0.3s ease-out',
+            }}
+          >
+            <div
+              style={{
+                width: '24px',
+                height: '24px',
+                border: '3px solid var(--info-200)',
+                borderTopColor: 'var(--info-500)',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+              }}
+            />
+            <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--info-700)' }}>
+              正在处理下载...
+            </span>
           </div>
         )}
 
-        <div className="mt-6">
-          <EmojiGrid
-            emojis={emojis}
-            onFileNameChange={updateFileName}
-            onToggleSelect={toggleSelect}
-            onSelectAll={selectAll}
-            onDeselectAll={deselectAll}
-            onDownload={handleDownloadOne}
-            onDownloadSelected={handleDownloadSelected}
-          />
+        {/* Results Section */}
+        <EmojiGrid
+          emojis={emojis}
+          onFileNameChange={updateFileName}
+          onToggleSelect={toggleSelect}
+          onSelectAll={selectAll}
+          onDeselectAll={deselectAll}
+          onDownload={handleDownloadOne}
+          onDownloadSelected={handleDownloadSelected}
+        />
+
+        {/* Empty State */}
+        {!image && emojis.length === 0 && (
+          <div
+            style={{
+              background: 'white',
+              borderRadius: 'var(--radius-2xl)',
+              padding: '64px 32px',
+              textAlign: 'center',
+              boxShadow: 'var(--shadow-md)',
+              border: '1px solid var(--gray-100)',
+              animation: 'fadeInUp 0.6s ease-out',
+            }}
+          >
+            <div
+              style={{
+                width: '100px',
+                height: '100px',
+                margin: '0 auto 24px',
+                background: 'linear-gradient(135deg, var(--primary-100), var(--primary-200))',
+                borderRadius: 'var(--radius-2xl)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '48px',
+              }}
+            >
+              🎨
+            </div>
+            <h2
+              style={{
+                fontSize: '20px',
+                fontWeight: 700,
+                color: 'var(--gray-800)',
+                marginBottom: '8px',
+              }}
+            >
+              上传图片开始裁剪你的表情包
+            </h2>
+            <p style={{ fontSize: '15px', color: 'var(--gray-500)' }}>
+              将雪碧图裁剪为单个表情，一键导出为 ZIP 文件
+            </p>
+          </div>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer
+        style={{
+          background: 'white',
+          borderTop: '1px solid var(--gray-200)',
+          padding: '24px',
+          marginTop: '48px',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '1280px',
+            margin: '0 auto',
+            textAlign: 'center',
+          }}
+        >
+          <p style={{ fontSize: '13px', color: 'var(--gray-400)' }}>
+            表情包裁剪工具 · 纯前端处理，图片不会上传到服务器
+          </p>
         </div>
-
-        {!image && (
-          <div className="mt-6 rounded-lg border border-dashed border-gray-300 bg-white p-8 text-center text-gray-400">
-            <svg className="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <p className="mt-2">上传图片开始裁剪</p>
-          </div>
-        )}
-      </div>
+      </footer>
     </div>
   )
 }

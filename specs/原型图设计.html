@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>表情包裁剪工具 - 原型图设计</title>
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* 主色调 - 清新薄荷绿 */
+      --primary-50: #F0FDF9;
+      --primary-100: #CCFBF1;
+      --primary-200: #99F6E4;
+      --primary-300: #5EEAD4;
+      --primary-400: #2DD4BF;
+      --primary-500: #14B8A6;
+      --primary-600: #0D9488;
+      --primary-700: #0F766E;
+      --primary-800: #115E59;
+      --primary-900: #134E4A;
+
+      /* 中性色 */
+      --gray-50: #F9FAFB;
+      --gray-100: #F3F4F6;
+      --gray-200: #E5E7EB;
+      --gray-300: #D1D5DB;
+      --gray-400: #9CA3AF;
+      --gray-500: #6B7280;
+      --gray-600: #4B5563;
+      --gray-700: #374151;
+      --gray-800: #1F2937;
+      --gray-900: #111827;
+
+      /* 功能色 */
+      --success-500: #22C55E;
+      --warning-500: #F59E0B;
+      --error-500: #EF4444;
+      --info-500: #3B82F6;
+
+      /* 字体 */
+      --font-display: 'ZCOOL KuaiLe', cursive;
+      --font-body: 'Noto Sans SC', 'PingFang SC', sans-serif;
+
+      /* 阴影 */
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      --shadow-primary: 0 4px 14px 0 rgba(20, 184, 166, 0.39);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--gray-50);
+      color: var(--gray-800);
+      line-height: 1.6;
+    }
+
+    /* 导航栏 */
+    .nav {
+      background: white;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 16px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 24px;
+      color: var(--primary-600);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .nav-link {
+      color: var(--gray-600);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--primary-600);
+    }
+
+    /* 主容器 */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    /* 页面标题 */
+    .page-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .page-title {
+      font-family: var(--font-display);
+      font-size: 42px;
+      color: var(--gray-900);
+      margin-bottom: 12px;
+    }
+
+    .page-subtitle {
+      font-size: 16px;
+      color: var(--gray-500);
+    }
+
+    /* 区块标题 */
+    .section {
+      margin-bottom: 64px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--primary-200);
+    }
+
+    .section-number {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+      color: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
+      box-shadow: var(--shadow-primary);
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--gray-800);
+    }
+
+    /* 原型展示网格 */
+    .prototype-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 32px;
+    }
+
+    .prototype-card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .prototype-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .prototype-header {
+      background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--primary-200);
+    }
+
+    .prototype-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--primary-800);
+    }
+
+    .prototype-desc {
+      font-size: 13px;
+      color: var(--gray-500);
+      margin-top: 4px;
+    }
+
+    .prototype-content {
+      padding: 24px;
+      background: var(--gray-50);
+    }
+
+    /* 模拟界面 */
+    .mockup {
+      background: white;
+      border-radius: 16px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+
+    .mockup-header {
+      background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mockup-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+    }
+
+    .mockup-body {
+      padding: 20px;
+    }
+
+    /* 组件样式 */
+    .upload-zone {
+      border: 2px dashed var(--gray-300);
+      border-radius: 16px;
+      padding: 48px 32px;
+      text-align: center;
+      background: white;
+      transition: all 0.3s;
+    }
+
+    .upload-zone:hover {
+      border-color: var(--primary-400);
+      background: var(--primary-50);
+    }
+
+    .upload-icon {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 28px;
+    }
+
+    .upload-text {
+      font-size: 16px;
+      color: var(--gray-700);
+      font-weight: 500;
+    }
+
+    .upload-hint {
+      font-size: 13px;
+      color: var(--gray-400);
+      margin-top: 8px;
+    }
+
+    /* 按钮 */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+      color: white;
+      box-shadow: var(--shadow-primary);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--gray-700);
+      border: 1px solid var(--gray-200);
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-50);
+      border-color: var(--gray-300);
+    }
+
+    /* 输入框 */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray-600);
+    }
+
+    .input {
+      padding: 10px 14px;
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      font-size: 14px;
+      transition: all 0.2s;
+      background: white;
+    }
+
+    .input:focus {
+      outline: none;
+      border-color: var(--primary-500);
+      box-shadow: 0 0 0 3px var(--primary-100);
+    }
+
+    /* 表情卡片 */
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .emoji-card {
+      background: white;
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .emoji-card:hover {
+      border-color: var(--primary-400);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .emoji-card.selected {
+      border-color: var(--primary-500);
+      box-shadow: 0 0 0 3px var(--primary-100);
+    }
+
+    .emoji-image {
+      aspect-ratio: 1;
+      background: linear-gradient(135deg, var(--gray-100), var(--gray-200));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+
+    .emoji-name {
+      padding: 8px;
+      font-size: 11px;
+      text-align: center;
+      color: var(--gray-600);
+      border-top: 1px solid var(--gray-100);
+    }
+
+    .emoji-check {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      width: 20px;
+      height: 20px;
+      background: var(--primary-500);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+    }
+
+    /* 设置面板 */
+    .settings-panel {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .settings-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--gray-800);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .settings-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .size-presets {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .size-preset {
+      padding: 6px 12px;
+      background: var(--gray-100);
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--gray-600);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .size-preset:hover,
+    .size-preset.active {
+      background: var(--primary-500);
+      color: white;
+    }
+
+    /* 网格预览 */
+    .preview-container {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .preview-image {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      aspect-ratio: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .grid-overlay {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(255,255,255,0.5) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.5) 1px, transparent 1px);
+      background-size: 25% 25%;
+    }
+
+    /* 交互说明 */
+    .interaction-list {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .interaction-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .interaction-item:last-child {
+      border-bottom: none;
+    }
+
+    .interaction-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--primary-50);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .interaction-content h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--gray-800);
+      margin-bottom: 4px;
+    }
+
+    .interaction-content p {
+      font-size: 13px;
+      color: var(--gray-500);
+    }
+
+    /* 状态标签 */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-success {
+      background: #F0FDF4;
+      color: var(--success-500);
+    }
+
+    .status-warning {
+      background: #FFFBEB;
+      color: var(--warning-500);
+    }
+
+    .status-error {
+      background: #FEF2F2;
+      color: var(--error-500);
+    }
+
+    /* 两栏布局 */
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    /* Toast 示例 */
+    .toast-examples {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .toast {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--gray-200);
+    }
+
+    .toast-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toast-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .toast-success .toast-icon {
+      background: var(--success-500);
+      color: white;
+    }
+
+    .toast-warning .toast-icon {
+      background: var(--warning-500);
+      color: white;
+    }
+
+    .toast-error .toast-icon {
+      background: var(--error-500);
+      color: white;
+    }
+
+    /* 页脚 */
+    .footer {
+      background: white;
+      border-top: 1px solid var(--gray-200);
+      padding: 32px 24px;
+      margin-top: 64px;
+      text-align: center;
+    }
+
+    .footer-text {
+      font-size: 14px;
+      color: var(--gray-500);
+    }
+
+    /* 响应式 */
+    @media (max-width: 1024px) {
+      .two-column {
+        grid-template-columns: 1fr;
+      }
+      
+      .prototype-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page-title {
+        font-size: 28px;
+      }
+      
+      .emoji-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      
+      .settings-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* 动画 */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section {
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .section:nth-child(2) { animation-delay: 0.1s; }
+    .section:nth-child(3) { animation-delay: 0.2s; }
+    .section:nth-child(4) { animation-delay: 0.3s; }
+  </style>
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="nav">
+    <div class="nav-content">
+      <div class="logo">
+        <span>🎨</span>
+        <span>表情包裁剪工具</span>
+      </div>
+      <div class="nav-links">
+        <a href="原型图设计.html" class="nav-link">原型图设计</a>
+        <a href="UI规格书.html" class="nav-link">UI规格书</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- 页面标题 -->
+    <header class="page-header">
+      <h1 class="page-title">📐 原型图设计文档</h1>
+      <p class="page-subtitle">表情包裁剪工具的界面原型与交互设计</p>
+    </header>
+
+    <!-- 1. 整体布局 -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">1</div>
+        <h2 class="section-title">整体布局结构</h2>
+      </div>
+      
+      <div class="mockup">
+        <div class="mockup-header">
+          <span class="mockup-title">🎨 表情包裁剪工具</span>
+          <span style="font-size: 14px; opacity: 0.9;">页面布局概览</span>
+        </div>
+        <div class="mockup-body">
+          <div style="background: var(--gray-50); border-radius: 12px; padding: 24px;">
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, var(--primary-500), var(--primary-600)); color: white; padding: 16px 20px; border-radius: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-family: var(--font-display); font-size: 18px;">🎨 表情包裁剪工具</span>
+              <span style="font-size: 13px; opacity: 0.9;">GitHub | 关于</span>
+            </div>
+            
+            <!-- Upload -->
+            <div style="background: white; border-radius: 12px; padding: 32px; text-align: center; margin-bottom: 16px; box-shadow: var(--shadow-sm);">
+              <div style="width: 64px; height: 64px; background: linear-gradient(135deg, var(--primary-100), var(--primary-200)); border-radius: 16px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 28px;">📁</div>
+              <div style="font-size: 15px; color: var(--gray-700); font-weight: 500;">拖拽图片到这里，或点击选择文件</div>
+              <div style="font-size: 12px; color: var(--gray-400); margin-top: 8px;">支持 PNG、GIF 格式，最大 10MB</div>
+            </div>
+            
+            <!-- Two Column -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+              <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow-sm);">
+                <div style="font-size: 14px; font-weight: 600; color: var(--gray-700); margin-bottom: 12px;">🔍 网格预览</div>
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; aspect-ratio: 1; position: relative;">
+                  <div style="position: absolute; inset: 0; background-image: linear-gradient(to right, rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.4) 1px, transparent 1px); background-size: 25% 25%;"></div>
+                </div>
+              </div>
+              <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow-sm);">
+                <div style="font-size: 14px; font-weight: 600; color: var(--gray-700); margin-bottom: 12px;">⚙️ 裁剪设置</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                  <div style="background: var(--gray-100); padding: 10px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 11px; color: var(--gray-500);">行数</div>
+                    <div style="font-size: 16px; font-weight: 600; color: var(--gray-800);">4</div>
+                  </div>
+                  <div style="background: var(--gray-100); padding: 10px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 11px; color: var(--gray-500);">列数</div>
+                    <div style="font-size: 16px; font-weight: 600; color: var(--gray-800);">4</div>
+                  </div>
+                </div>
+                <div style="background: linear-gradient(135deg, var(--primary-500), var(--primary-600)); color: white; padding: 12px; border-radius: 10px; text-align: center; font-weight: 600;">✂️ 一键裁剪</div>
+              </div>
+            </div>
+            
+            <!-- Results -->
+            <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow-sm);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <span style="font-size: 14px; font-weight: 600; color: var(--gray-700);">🎯 裁剪结果 (16个表情)</span>
+                <span style="font-size: 12px; color: var(--gray-400);">已选择 3 个</span>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px;">
+                <div style="background: var(--gray-100); aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 2px solid var(--primary-500);">😀</div>
+                <div style="background: var(--gray-100); aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px;">😂</div>
+                <div style="background: var(--gray-100); aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 2px solid var(--primary-500);">🥰</div>
+                <div style="background: var(--gray-100); aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px;">😎</div>
+                <div style="background: var(--gray-100); aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 2px solid var(--primary-500);">🤔</div>
+                <div style="background: var(--gray-100); aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px;">😴</div>
+                <div style="background: var(--gray-100); aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px;">😭</div>
+                <div style="background: var(--gray-100); aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px;">🎉</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. 页面状态 -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">2</div>
+        <h2 class="section-title">页面状态原型</h2>
+      </div>
+      
+      <div class="prototype-grid">
+        <!-- 空状态 -->
+        <div class="prototype-card">
+          <div class="prototype-header">
+            <div class="prototype-name">📭 初始状态 (Empty State)</div>
+            <div class="prototype-desc">用户首次进入页面，未上传图片</div>
+          </div>
+          <div class="prototype-content">
+            <div class="mockup">
+              <div class="mockup-header">
+                <span class="mockup-title">🎨 表情包裁剪工具</span>
+              </div>
+              <div class="mockup-body">
+                <div class="upload-zone">
+                  <div class="upload-icon">📁</div>
+                  <div class="upload-text">拖拽图片到这里，或点击选择文件</div>
+                  <div class="upload-hint">支持 PNG、GIF 格式，最大 10MB</div>
+                </div>
+                <div style="text-align: center; margin-top: 24px; padding: 32px; background: var(--gray-50); border-radius: 12px;">
+                  <div style="font-size: 48px; margin-bottom: 12px;">🎨</div>
+                  <div style="font-size: 14px; color: var(--gray-600); font-weight: 500;">上传图片开始裁剪你的表情包</div>
+                  <div style="font-size: 12px; color: var(--gray-400); margin-top: 8px;">将雪碧图裁剪为单个表情，一键导出</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 已上传状态 -->
+        <div class="prototype-card">
+          <div class="prototype-header">
+            <div class="prototype-name">📤 图片已上传</div>
+            <div class="prototype-desc">用户上传雪碧图后的状态</div>
+          </div>
+          <div class="prototype-content">
+            <div class="mockup">
+              <div class="mockup-header">
+                <span class="mockup-title">🎨 表情包裁剪工具</span>
+              </div>
+              <div class="mockup-body">
+                <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <span style="font-size: 13px; color: var(--gray-600);">已上传图片</span>
+                    <span style="font-size: 12px; color: var(--primary-600); cursor: pointer;">重新上传</span>
+                  </div>
+                  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; aspect-ratio: 1; position: relative; max-width: 200px; margin: 0 auto;">
+                    <div style="position: absolute; inset: 0; background-image: linear-gradient(to right, rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.4) 1px, transparent 1px); background-size: 25% 25%;"></div>
+                  </div>
+                  <div style="font-size: 12px; color: var(--gray-500); margin-top: 12px; text-align: center;">
+                    图片尺寸: 960 × 960px | 单元格: 240 × 240px
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 裁剪完成状态 -->
+        <div class="prototype-card">
+          <div class="prototype-header">
+            <div class="prototype-name">✅ 裁剪完成</div>
+            <div class="prototype-desc">裁剪成功后的结果展示</div>
+          </div>
+          <div class="prototype-content">
+            <div class="mockup">
+              <div class="mockup-header">
+                <span class="mockup-title">🎨 表情包裁剪工具</span>
+              </div>
+              <div class="mockup-body">
+                <div style="background: white; border-radius: 12px; padding: 16px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div>
+                      <span style="font-size: 14px; font-weight: 600; color: var(--gray-800);">✅ 裁剪结果 (16个表情)</span>
+                    </div>
+                    <span style="font-size: 12px; color: var(--gray-500);">已选择 3 个</span>
+                  </div>
+                  <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">全选</button>
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">取消全选</button>
+                    <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px; margin-left: auto;">下载选中 3个</button>
+                  </div>
+                  <div class="emoji-grid" style="grid-template-columns: repeat(4, 1fr);">
+                    <div class="emoji-card selected">
+                      <div class="emoji-check">✓</div>
+                      <div class="emoji-image">😀</div>
+                      <div class="emoji-name">emoji_01</div>
+                    </div>
+                    <div class="emoji-card">
+                      <div class="emoji-image">😂</div>
+                      <div class="emoji-name">emoji_02</div>
+                    </div>
+                    <div class="emoji-card selected">
+                      <div class="emoji-check">✓</div>
+                      <div class="emoji-image">🥰</div>
+                      <div class="emoji-name">emoji_03</div>
+                    </div>
+                    <div class="emoji-card">
+                      <div class="emoji-image">😎</div>
+                      <div class="emoji-name">emoji_04</div>
+                    </div>
+                    <div class="emoji-card selected">
+                      <div class="emoji-check">✓</div>
+                      <div class="emoji-image">🤔</div>
+                      <div class="emoji-name">emoji_05</div>
+                    </div>
+                    <div class="emoji-card">
+                      <div class="emoji-image">😴</div>
+                      <div class="emoji-name">emoji_06</div>
+                    </div>
+                    <div class="emoji-card">
+                      <div class="emoji-image">😭</div>
+                      <div class="emoji-name">emoji_07</div>
+                    </div>
+                    <div class="emoji-card">
+                      <div class="emoji-image">🎉</div>
+                      <div class="emoji-name">emoji_08</div>
+                    </div>
+                  </div>
+                  <div style="text-align: center; margin-top: 12px; font-size: 11px; color: var(--gray-400);">
+                    💡 双击文件名可编辑，点击图片切换选中状态
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 文件名编辑状态 -->
+        <div class="prototype-card">
+          <div class="prototype-header">
+            <div class="prototype-name">✏️ 文件名编辑</div>
+            <div class="prototype-desc">双击文件名进入编辑模式</div>
+          </div>
+          <div class="prototype-content">
+            <div style="display: flex; gap: 16px; justify-content: center;">
+              <div class="emoji-card selected" style="width: 120px;">
+                <div class="emoji-check">✓</div>
+                <div class="emoji-image">😀</div>
+                <div style="padding: 8px; border-top: 1px solid var(--gray-100);">
+                  <input type="text" value="开心" style="width: 100%; padding: 4px 8px; border: 2px solid var(--primary-500); border-radius: 6px; font-size: 12px; text-align: center; outline: none;">
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; justify-content: center; gap: 8px;">
+                <div style="font-size: 12px; color: var(--gray-600);"><kbd style="background: var(--gray-100); padding: 2px 6px; border-radius: 4px;">Enter</kbd> 确认修改</div>
+                <div style="font-size: 12px; color: var(--gray-600);"><kbd style="background: var(--gray-100); padding: 2px 6px; border-radius: 4px;">Esc</kbd> 取消修改</div>
+                <div style="font-size: 12px; color: var(--gray-600);">失焦自动保存</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. 组件详细原型 -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">3</div>
+        <h2 class="section-title">组件详细原型</h2>
+      </div>
+      
+      <div class="two-column">
+        <!-- 上传区域 -->
+        <div class="prototype-card">
+          <div class="prototype-header">
+            <div class="prototype-name">📤 上传区域 (ImageUploader)</div>
+          </div>
+          <div class="prototype-content">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <!-- 默认状态 -->
+              <div>
+                <div style="font-size: 12px; color: var(--gray-500); margin-bottom: 8px;">默认状态</div>
+                <div class="upload-zone" style="padding: 32px;">
+                  <div class="upload-icon" style="width: 48px; height: 48px; font-size: 20px;">📁</div>
+                  <div style="font-size: 14px; color: var(--gray-700); font-weight: 500;">拖拽图片到这里，或点击选择文件</div>
+                  <div style="font-size: 11px; color: var(--gray-400); margin-top: 6px;">支持 PNG、GIF 格式，最大 10MB</div>
+                </div>
+              </div>
+              
+              <!-- 拖拽激活状态 -->
+              <div>
+                <div style="font-size: 12px; color: var(--gray-500); margin-bottom: 8px;">拖拽激活状态</div>
+                <div style="border: 2px solid var(--primary-500); border-radius: 16px; padding: 32px; text-align: center; background: var(--primary-50);">
+                  <div style="font-size: 14px; color: var(--primary-700); font-weight: 600;">放开以上传图片</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 裁剪控制面板 -->
+        <div class="prototype-card">
+          <div class="prototype-header">
+            <div class="prototype-name">⚙️ 裁剪控制面板 (CropControls)</div>
+          </div>
+          <div class="prototype-content">
+            <div class="settings-panel">
+              <div class="settings-title">裁剪设置</div>
+              
+              <div style="margin-bottom: 16px;">
+                <div style="font-size: 12px; color: var(--gray-500); margin-bottom: 8px;">网格配置</div>
+                <div class="settings-row">
+                  <div class="input-group">
+                    <label class="input-label">行数</label>
+                    <input type="text" class="input" value="4" style="text-align: center;">
+                  </div>
+                  <div class="input-group">
+                    <label class="input-label">列数</label>
+                    <input type="text" class="input" value="4" style="text-align: center;">
+                  </div>
+                </div>
+              </div>
+              
+              <div style="margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span style="font-size: 12px; color: var(--gray-500);">输出尺寸</span>
+                  <span style="font-size: 11px; color: var(--primary-600); background: var(--primary-50); padding: 2px 8px; border-radius: 4px;">🔒 已锁定</span>
+                </div>
+                <div class="settings-row">
+                  <div class="input-group">
+                    <input type="text" class="input" value="240" style="text-align: center;">
+                  </div>
+                  <div class="input-group">
+                    <input type="text" class="input" value="240" style="text-align: center;">
+                  </div>
+                </div>
+                <div class="size-presets" style="margin-top: 8px;">
+                  <span class="size-preset">120×120</span>
+                  <span class="size-preset active">240×240</span>
+                  <span class="size-preset">512×512</span>
+                </div>
+              </div>
+              
+              <div style="background: var(--warning-50); border-radius: 8px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--warning-500);">
+                ⚠️ 图片尺寸不能被 4×4 网格整除
+              </div>
+              
+              <div style="font-size: 12px; color: var(--gray-500); margin-bottom: 12px; text-align: center;">
+                将生成 16 个表情
+              </div>
+              
+              <button class="btn btn-primary" style="width: 100%;">
+                <span>✂️</span>
+                <span>一键裁剪</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. 交互说明 -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">4</div>
+        <h2 class="section-title">交互动效规格</h2>
+      </div>
+      
+      <div class="two-column">
+        <div class="interaction-list">
+          <div class="interaction-item">
+            <div class="interaction-icon">🖱️</div>
+            <div class="interaction-content">
+              <h4>悬停效果 (Hover)</h4>
+              <p>卡片悬停时上浮 2px，阴影加深。按钮悬停时背景色变深，轻微上浮。</p>
+            </div>
+          </div>
+          <div class="interaction-item">
+            <div class="interaction-icon">👆</div>
+            <div class="interaction-content">
+              <h4>点击反馈 (Active)</h4>
+              <p>按钮点击时缩放至 0.97，卡片点击时有明显的按压感。</p>
+            </div>
+          </div>
+          <div class="interaction-item">
+            <div class="interaction-icon">✨</div>
+            <div class="interaction-content">
+              <h4>页面加载动画</h4>
+              <p>元素淡入 + 向上位移 20px，时长 600ms，使用 ease-soft 缓动。</p>
+            </div>
+          </div>
+          <div class="interaction-item">
+            <div class="interaction-icon">🎯</div>
+            <div class="interaction-content">
+              <h4>选中状态切换</h4>
+              <p>边框变色 + 勾选标记出现，时长 150ms，过渡流畅。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="interaction-list">
+          <div class="interaction-item">
+            <div class="interaction-icon">📝</div>
+            <div class="interaction-content">
+              <h4>文件名编辑</h4>
+              <p>双击后输入框自动聚焦并全选文字，Enter 确认，Esc 取消。</p>
+            </div>
+          </div>
+          <div class="interaction-item">
+            <div class="interaction-icon">📤</div>
+            <div class="interaction-content">
+              <h4>拖拽上传</h4>
+              <p>拖拽进入时边框变实线，背景变色，显示"放开以上传"。</p>
+            </div>
+          </div>
+          <div class="interaction-item">
+            <div class="interaction-icon">🔔</div>
+            <div class="interaction-content">
+              <h4>Toast 通知</h4>
+              <p>从右侧滑入 + 淡入 300ms，停留 3 秒后向上滑出。</p>
+            </div>
+          </div>
+          <div class="interaction-item">
+            <div class="interaction-icon">⌨️</div>
+            <div class="interaction-content">
+              <h4>键盘快捷键</h4>
+              <p>Enter 快速裁剪，Tab 切换焦点，Esc 关闭弹窗。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Toast 通知示例 -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">5</div>
+        <h2 class="section-title">Toast 通知样式</h2>
+      </div>
+      
+      <div class="toast-examples" style="max-width: 500px;">
+        <div class="toast toast-success">
+          <div class="toast-content">
+            <div class="toast-icon">✓</div>
+            <span style="font-size: 14px; color: var(--gray-700);">成功裁剪 16 个表情</span>
+          </div>
+          <span style="color: var(--gray-400); cursor: pointer;">✕</span>
+        </div>
+        <div class="toast toast-warning">
+          <div class="toast-content">
+            <div class="toast-icon">!</div>
+            <span style="font-size: 14px; color: var(--gray-700);">请先选择要下载的表情</span>
+          </div>
+          <span style="color: var(--gray-400); cursor: pointer;">✕</span>
+        </div>
+        <div class="toast toast-error">
+          <div class="toast-content">
+            <div class="toast-icon">✕</div>
+            <span style="font-size: 14px; color: var(--gray-700);">图片格式不支持</span>
+          </div>
+          <span style="color: var(--gray-400); cursor: pointer;">✕</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. 响应式布局 -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-number">6</div>
+        <h2 class="section-title">响应式布局</h2>
+      </div>
+      
+      <div class="prototype-grid" style="grid-template-columns: repeat(4, 1fr);">
+        <div class="prototype-card">
+          <div class="prototype-header">
+            <div class="prototype-name">🖥️ 桌面端 (≥1024px)</div>
+          </div>
+          <div class="prototype-content" style="text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 12px;">🖥️</div>
+            <div style="font-size: 13px; color: var(--gray-600);">双栏布局</div>
+            <div style="font-size: 12px; color: var(--gray-400); margin-top: 4px;">预览 + 设置并排</div>
+            <div style="font-size: 12px; color: var(--primary-600); margin-top: 8px;">卡片 6-8 列</div>
+          </div>
+        </div>
+        <div class="prototype-card">
+          <div class="prototype-header">
+            <div class="prototype-name">📱 平板端 (768px+)</div>
+          </div>
+          <div class="prototype-content" style="text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 12px;">📱</div>
+            <div style="font-size: 13px; color: var(--gray-600);">单栏堆叠</div>
+            <div style="font-size: 12px; color: var(--gray-400); margin-top: 4px;">垂直排列</div>
+            <div style="font-size: 12px; color: var(--primary-600); margin-top: 8px;">卡片 4-5 列</div>
+          </div>
+        </div>
+        <div class="prototype-card">
+          <div class="prototype-header">
+            <div class="prototype-name">📲 移动端 (<768px)</div>
+          </div>
+          <div class="prototype-content" style="text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 12px;">📲</div>
+            <div style="font-size: 13px; color: var(--gray-600);">紧凑布局</div>
+            <div style="font-size: 12px; color: var(--gray-400); margin-top: 4px;">全宽组件</div>
+            <div style="font-size: 12px; color: var(--primary-600); margin-top: 8px;">卡片 3-4 列</div>
+          </div>
+        </div>
+        <div class="prototype-card">
+          <div class="prototype-header">
+            <div class="prototype-name">网格断点</div>
+          </div>
+          <div class="prototype-content">
+            <div style="font-size: 12px; color: var(--gray-600); line-height: 2;">
+              <div>≥1280px: <strong>8列</strong></div>
+              <div>≥1024px: <strong>6列</strong></div>
+              <div>≥768px: <strong>5列</strong></div>
+              <div>≥640px: <strong>4列</strong></div>
+              <div>&lt;640px: <strong>3列</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <p class="footer-text">表情包裁剪工具 · 原型图设计文档</p>
+  </footer>
+</body>
+</html>
